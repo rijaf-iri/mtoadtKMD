@@ -285,14 +285,16 @@ spRainAccumulAWS <- function(tstep, time, accumul, aws_dir){
 
     DBI::dbDisconnect(conn)
 
+    id_net <- lapply(crds, '[[', 'network_code')
+    id_net <- do.call(c, id_net)
+
     nmCol <- c("id", "name", "longitude", "latitude", "altitude", "network")
+    # crds <- rbind(adcoCrd[, nmCol, drop = FALSE],
+    #               campCrd[, nmCol, drop = FALSE])
 
     crds <- lapply(crds, function(x) x[, nmCol, drop = FALSE])
     crds <- do.call(rbind, crds)
-    id_aws <- paste0(crds$network_code, "_", crds$id)
-
-    # crds <- rbind(adcoCrd[, nmCol, drop = FALSE],
-    #               campCrd[, nmCol, drop = FALSE])
+    id_aws <- paste0(id_net, "_", crds$id)
 
     # id_net <- rep(NA, nrow(crds))
     # id_net[crds$network == "Campbell"] <- 1

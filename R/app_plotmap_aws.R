@@ -1,6 +1,6 @@
-#' Get AWS 30 minutes spatial data.
+#' Get AWS 1 hour spatial data.
 #'
-#' Get AWS 30 minutes spatial data to display on map.
+#' Get AWS 1 hour spatial data to display on map.
 #' 
 #' @param time the time to display in the format "YYYY-MM-DD-HH-MM".
 #' @param aws_dir full path to the directory containing ADT.\cr
@@ -175,7 +175,6 @@ spatialMinAWSData <- function(time, aws_dir){
         return(crd)
     })
 
-
     # adcoCrd <- DBI::dbReadTable(conn, "adcon_crds")
     # adcoCrd$network <- "Adcon"
     # campCrd <- DBI::dbReadTable(conn, "campbell_crds")
@@ -183,13 +182,16 @@ spatialMinAWSData <- function(time, aws_dir){
 
     DBI::dbDisconnect(conn)
 
+    id_net <- lapply(crds, '[[', 'network_code')
+    id_net <- do.call(c, id_net)
+
     nmCol <- c("id", "name", "longitude", "latitude", "altitude", "network")
     # crds <- rbind(adcoCrd[, nmCol, drop = FALSE],
     #               campCrd[, nmCol, drop = FALSE])
 
     crds <- lapply(crds, function(x) x[, nmCol, drop = FALSE])
     crds <- do.call(rbind, crds)
-    id_aws <- paste0(crds$network_code, "_", crds$id)
+    id_aws <- paste0(id_net, "_", crds$id)
 
     # id_net <- rep(NA, nrow(crds))
     # id_net[crds$network == "Campbell"] <- 1
@@ -471,13 +473,16 @@ spatialAggrAWS <- function(tstep, time, aws_dir){
 
     DBI::dbDisconnect(conn)
 
+    id_net <- lapply(crds, '[[', 'network_code')
+    id_net <- do.call(c, id_net)
+
     nmCol <- c("id", "name", "longitude", "latitude", "altitude", "network")
     # crds <- rbind(adcoCrd[, nmCol, drop = FALSE],
     #               campCrd[, nmCol, drop = FALSE])
 
     crds <- lapply(crds, function(x) x[, nmCol, drop = FALSE])
     crds <- do.call(rbind, crds)
-    id_aws <- paste0(crds$network_code, "_", crds$id)
+    id_aws <- paste0(id_net, "_", crds$id)
 
     # id_net <- rep(NA, nrow(crds))
     # id_net[crds$network == "Campbell"] <- 1

@@ -2,7 +2,7 @@
 % Please edit documentation in R/app_plotmap_aws.R
 \name{mapMinAWSData}
 \alias{mapMinAWSData}
-\title{Get AWS 30 minutes spatial data.}
+\title{Get AWS 1 hour spatial data.}
 \usage{
 mapMinAWSData(time, aws_dir)
 }
@@ -16,5 +16,5 @@ Example: "D:/KMD_AWS_v2"}
 a JSON object
 }
 \description{
-Get AWS 30 minutes spatial data to display on map.
+Get AWS 1 hour spatial data to display on map.
 }
