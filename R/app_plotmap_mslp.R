@@ -46,7 +46,7 @@ compute_mslp <- function(time, aws_dir){
 
     if(spdon$status != "ok") return(spdon)
 
-    press_avg <- '1_1.5_1'
+    press_avg <- '1_2_1'
     temp_avg <- '2_2_1'
 
     spdon$data <- spdon$data[c('id', 'name', 'longitude', 'latitude',
