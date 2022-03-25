@@ -13,6 +13,21 @@
 readCoords <- function(aws_dir){
     parsFile <- file.path(aws_dir, "AWS_DATA", "JSON", "aws_parameters.json")
     awsPars <- jsonlite::read_json(parsFile)
+    crds <- readCoordsData(aws_dir)
+    id <- sapply(awsPars, '[[', 'id')
+    ix <- match(id, crds$id)
+
+    awsPars <- lapply(seq_along(id), function(j){
+        x <- awsPars[[j]]
+        y <- as.list(crds[ix[j], ])
+        nx <- names(x)
+        nx <- nx[nx %in% names(y)]
+        for(n in nx) x[[n]] <- y[[n]]
+        x$startdate <- y$startdate
+        x$enddate <- y$enddate
+
+        return(x)
+    })
 
     return(convJSON(awsPars))
 }
