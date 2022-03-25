@@ -136,7 +136,13 @@ mapMinAWSData <- function(time, aws_dir){
 spatialMinAWSData <- function(time, aws_dir){
     tz <- Sys.getenv("TZ")
     origin <- "1970-01-01"
+    netNOM <- c("Tahmo", "Campbell", "Sutron", "Seba", "Microstep", "Adcon")
+    netCRDS <- c("tahmo_crds", "campbell_crds", "sutron_crds", "seba_crds",
+                 "microstep_crds", "adcon_crds")
+    nmCol <- c("id", "name", "longitude", "latitude", "altitude", "network")
+    nmVar <- c("network", "id", "height", "var_code", "stat_code", "value")
 
+    ######
     temps <- strptime(time, "%Y-%m-%d-%H-%M", tz = tz)
     time <- as.numeric(temps)
     dout <- format(temps, "%Y-%m-%d %H:%M:%S")
@@ -158,15 +164,10 @@ spatialMinAWSData <- function(time, aws_dir){
     if(nrow(qres) == 0) return(data.null)
 
     qres$value[!is.na(qres$limit_check)] <- NA
-
-    nmVar <- c("network", "id", "height", "var_code", "stat_code", "value")
     qres <- qres[, nmVar, drop = FALSE]
 
     ######
 
-    netNOM <- c("Tahmo", "Campbell", "Sutron", "Seba", "Microstep", "Adcon")
-    netCRDS <- c("tahmo_crds", "campbell_crds", "sutron_crds", "seba_crds",
-                 "microstep_crds", "adcon_crds")
     crds <- lapply(seq_along(netNOM), function(j){
         crd <- DBI::dbReadTable(conn, netCRDS[j])
         crd$network <- netNOM[j]
@@ -175,40 +176,17 @@ spatialMinAWSData <- function(time, aws_dir){
         return(crd)
     })
 
-    # adcoCrd <- DBI::dbReadTable(conn, "adcon_crds")
-    # adcoCrd$network <- "Adcon"
-    # campCrd <- DBI::dbReadTable(conn, "campbell_crds")
-    # campCrd$network <- "Campbell"
-
     DBI::dbDisconnect(conn)
 
     id_net <- lapply(crds, '[[', 'network_code')
     id_net <- do.call(c, id_net)
 
-    nmCol <- c("id", "name", "longitude", "latitude", "altitude", "network")
-    # crds <- rbind(adcoCrd[, nmCol, drop = FALSE],
-    #               campCrd[, nmCol, drop = FALSE])
-
     crds <- lapply(crds, function(x) x[, nmCol, drop = FALSE])
     crds <- do.call(rbind, crds)
     id_aws <- paste0(id_net, "_", crds$id)
 
-    # id_net <- rep(NA, nrow(crds))
-    # id_net[crds$network == "Campbell"] <- 1
-    # id_net[crds$network == "Adcon"] <- 2
-    # crds$network_code <- id_net
-    # id_aws <- paste0(id_net, "_", crds$id)
-
     qres$aws <- paste0(qres$network, "_", qres$id)
     qres$vars <- paste0(qres$var_code, "_", qres$height, "_", qres$stat_code)
-
-    # qres$index <- seq(nrow(qres))
-    # index <- reshape2::acast(qres, aws~vars, mean, value.var = 'index')
-    # index[is.nan(index)] <- NA
-    # qc_value <- qres$value[index]
-    # dim(qc_value) <- dim(index)
-    # raw_value <- qres$raw_value[index]
-    # dim(raw_value) <- dim(index)
 
     don <- reshape2::acast(qres, aws~vars, mean, value.var = 'value')
     don[is.nan(don)] <- NA
@@ -364,7 +342,12 @@ mapAggrAWSData <- function(tstep, time, aws_dir){
 spatialAggrAWS <- function(tstep, time, aws_dir){
     tz <- Sys.getenv("TZ")
     origin <- "1970-01-01"
+    netNOM <- c("Tahmo", "Campbell", "Sutron", "Seba", "Microstep", "Adcon")
+    netCRDS <- c("tahmo_crds", "campbell_crds", "sutron_crds", "seba_crds",
+                 "microstep_crds", "adcon_crds")
+    nmCol <- c("id", "name", "longitude", "latitude", "altitude", "network")
 
+    ######
     infoData <- switch(tstep,
                        'hourly' = local({
                             tt <- strptime(time, "%Y-%m-%d-%H", tz = tz)
@@ -455,9 +438,6 @@ spatialAggrAWS <- function(tstep, time, aws_dir){
     if(nrow(qres) == 0) return(data.null)
 
     ######
-    netNOM <- c("Tahmo", "Campbell", "Sutron", "Seba", "Microstep", "Adcon")
-    netCRDS <- c("tahmo_crds", "campbell_crds", "sutron_crds", "seba_crds",
-                 "microstep_crds", "adcon_crds")
     crds <- lapply(seq_along(netNOM), function(j){
         crd <- DBI::dbReadTable(conn, netCRDS[j])
         crd$network <- netNOM[j]
@@ -466,29 +446,14 @@ spatialAggrAWS <- function(tstep, time, aws_dir){
         return(crd)
     })
 
-    # adcoCrd <- DBI::dbReadTable(conn, "adcon_crds")
-    # adcoCrd$network <- "Adcon"
-    # campCrd <- DBI::dbReadTable(conn, "campbell_crds")
-    # campCrd$network <- "Campbell"
-
     DBI::dbDisconnect(conn)
 
     id_net <- lapply(crds, '[[', 'network_code')
     id_net <- do.call(c, id_net)
 
-    nmCol <- c("id", "name", "longitude", "latitude", "altitude", "network")
-    # crds <- rbind(adcoCrd[, nmCol, drop = FALSE],
-    #               campCrd[, nmCol, drop = FALSE])
-
     crds <- lapply(crds, function(x) x[, nmCol, drop = FALSE])
     crds <- do.call(rbind, crds)
     id_aws <- paste0(id_net, "_", crds$id)
-
-    # id_net <- rep(NA, nrow(crds))
-    # id_net[crds$network == "Campbell"] <- 1
-    # id_net[crds$network == "Adcon"] <- 2
-    # crds$network_code <- id_net
-    # id_aws <- paste0(id_net, "_", crds$id)
 
     ############
 

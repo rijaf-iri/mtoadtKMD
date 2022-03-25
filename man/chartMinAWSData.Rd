@@ -7,7 +7,8 @@
 chartMinAWSData(net_aws, var_hgt, stat, start, end, plotrange, aws_dir)
 }
 \arguments{
-\item{net_aws}{the network code and AWS ID, form <network code>_<AWS ID>. AWS network code, 1: tahmo, 2: campbell, 3: sutron, 4: seba, 5: microstep, 6: adcon.}
+\item{net_aws}{the network code and AWS ID, form <network code>_<AWS ID>. 
+AWS network code, 1: tahmo, 2: campbell, 3: sutron, 4: seba, 5: microstep, 6: adcon.}
 
 \item{var_hgt}{the variable code and observation height, form  <var code>_<height>.}
 

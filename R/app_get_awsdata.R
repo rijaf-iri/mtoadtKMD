@@ -477,7 +477,9 @@ getWindData <- function(net_aws, height, tstep, start, end, aws_dir)
 {
     tz <- Sys.getenv("TZ")
     origin <- "1970-01-01"
+    timestep_aws <- c(5, 5, 10, 10, 60, 15)
 
+    ######
     parsFile <- file.path(aws_dir, "AWS_DATA", "JSON", "aws_parameters.json")
     awsPars <- jsonlite::read_json(parsFile)
 
@@ -529,11 +531,7 @@ getWindData <- function(net_aws, height, tstep, start, end, aws_dir)
         tstep.out <- 1
     }else{
         dts <- sort(daty)
-        ts_sec <- switch(net_aws[1],
-                         "1" = 5, "2" = 5,
-                         "3" = 10, "4" = 10,
-                         "5" = 60, "6" = 15
-                        )
+        ts_sec <- timestep_aws[as.integer(net_aws[1])]
         tstep.seq <- paste(ts_sec, 'min')
         tstep.out <- ts_sec
     }

@@ -2,8 +2,9 @@
 #'
 #' Get 10 or 15 minutes data for download.
 #' 
-#' @param net_aws the network code and AWS ID, form <network code>_<AWS ID>. AWS network code, 1: tahmo, 2: campbell, 3: sutron, 4: seba, 5: microstep, 6: adcon.
-#' @param var_hgt the variable code and observation height, form  <var code>_<height>.
+#' @param net_aws the network code and AWS ID, form <network code>_<AWS ID>. 
+#' AWS network code, 1: tahmo, 2: campbell, 3: sutron, 4: seba, 5: microstep, 6: adcon.
+#' @param var_hgt the variable code and observation height, form <var code>_<height>.
 #' @param start start time.
 #' @param end end time.
 #' @param aws_dir full path to the directory containing ADT.\cr
@@ -100,7 +101,8 @@ downAWSMinDataCSV <- function(net_aws, var_hgt, start, end, aws_dir)
 #' Get aggregated data displayed on the table for download.
 #' 
 #' @param tstep the time step of the data.
-#' @param net_aws the network code and AWS ID, form <network code>_<AWS ID>. AWS network code, 1: tahmo, 2: campbell, 3: sutron, 4: seba, 5: microstep, 6: adcon.
+#' @param net_aws the network code and AWS ID, form <network code>_<AWS ID>. 
+#' AWS network code, 1: tahmo, 2: campbell, 3: sutron, 4: seba, 5: microstep, 6: adcon.
 #' @param start start date.
 #' @param end end date.
 #' @param aws_dir full path to the directory containing ADT.\cr
@@ -121,7 +123,8 @@ downTableAggrCSV <- function(tstep, net_aws, start, end, aws_dir){
 #' Get aggregated data displayed on the chart for download.
 #' 
 #' @param tstep the time step of the data.
-#' @param net_aws the network code and AWS ID, form <network code>_<AWS ID>. AWS network code, 1: tahmo, 2: campbell, 3: sutron, 4: seba, 5: microstep, 6: adcon.
+#' @param net_aws the network code and AWS ID, form <network code>_<AWS ID>. 
+#' AWS network code, 1: tahmo, 2: campbell, 3: sutron, 4: seba, 5: microstep, 6: adcon.
 #' @param var_hgt the variable code and observation height, form  <var code>_<height>.
 #' @param start start date.
 #' @param end end date.
@@ -154,7 +157,8 @@ downAWSAggrOneVarCSV <- function(tstep, net_aws, var_hgt, start, end, aws_dir){
 #' Get aggregated data to download for multiple AWS.
 #' 
 #' @param tstep the time step of the data.
-#' @param net_aws a vector of the network code and AWS ID, form <network code>_<AWS ID>. AWS network code, 1: tahmo, 2: campbell, 3: sutron, 4: seba, 5: microstep, 6: adcon.
+#' @param net_aws a vector of the network code and AWS ID, form <network code>_<AWS ID>. 
+#' AWS network code, 1: tahmo, 2: campbell, 3: sutron, 4: seba, 5: microstep, 6: adcon.
 #' @param var_hgt the variable code and observation height, form  <var code>_<height>.
 #' @param pars parameters.
 #' @param start start time.
@@ -234,7 +238,8 @@ downAWSAggrCDTDataCSV <- function(tstep, var_hgt, pars, start, end, aws_dir)
 #' Get wind data for download.
 #' 
 #' @param tstep time step of the data.
-#' @param net_aws the network code and AWS ID, form <network code>_<AWS ID>. AWS network code, 1: tahmo, 2: campbell, 3: sutron, 4: seba, 5: microstep, 6: adcon.
+#' @param net_aws the network code and AWS ID, form <network code>_<AWS ID>. 
+#' AWS network code, 1: tahmo, 2: campbell, 3: sutron, 4: seba, 5: microstep, 6: adcon.
 #' @param height the observation height.
 #' @param start start time.
 #' @param end end time.
@@ -270,7 +275,8 @@ downWindBarbCSV <- function(net_aws, height, tstep, start, end, aws_dir)
 #' Get wind frequency for download.
 #' 
 #' @param tstep time step of the data.
-#' @param net_aws the network code and AWS ID, form <network code>_<AWS ID>. AWS network code, 1: tahmo, 2: campbell, 3: sutron, 4: seba, 5: microstep, 6: adcon.
+#' @param net_aws the network code and AWS ID, form <network code>_<AWS ID>. 
+#' AWS network code, 1: tahmo, 2: campbell, 3: sutron, 4: seba, 5: microstep, 6: adcon.
 #' @param height the observation height.
 #' @param start start time.
 #' @param end end time.
@@ -356,7 +362,8 @@ downRainAccumulSP <- function(tstep, time, accumul, aws_dir){
 #' Compute precipitation accumulation for download.
 #' 
 #' @param tstep time basis to accumulate the data.
-#' @param net_aws a vector of the network code and AWS ID, form <network code>_<AWS ID>. AWS network code, 1: tahmo, 2: campbell, 3: sutron, 4: seba, 5: microstep, 6: adcon.
+#' @param net_aws a vector of the network code and AWS ID, form <network code>_<AWS ID>. 
+#' AWS network code, 1: tahmo, 2: campbell, 3: sutron, 4: seba, 5: microstep, 6: adcon.
 #' @param start start date.
 #' @param end end date.
 #' @param accumul accumulation duration.

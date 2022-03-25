@@ -4,7 +4,8 @@
 #' Compute precipitation accumulation for chart display.
 #' 
 #' @param tstep time basis to accumulate the data.
-#' @param net_aws a vector of the network code and AWS ID, form <network code>_<AWS ID>. AWS network code, 1: tahmo, 2: campbell, 3: sutron, 4: seba, 5: microstep, 6: adcon.
+#' @param net_aws a vector of the network code and AWS ID, form <network code>_<AWS ID>. 
+#' AWS network code, 1: tahmo, 2: campbell, 3: sutron, 4: seba, 5: microstep, 6: adcon.
 #' @param start start date.
 #' @param end end date.
 #' @param accumul accumulation duration.
@@ -101,7 +102,11 @@ tsRainAccumulAWS <- function(tstep, net_aws, start, end, accumul, aws_dir)
 {
     tz <- Sys.getenv("TZ")
     origin <- "1970-01-01"
+    nmCol <- c("network_code", "network", "id", "name",
+               "longitude", "latitude", "altitude",
+               "County", "SubCounty")
 
+    #####
     accumul <- as.numeric(accumul)
 
     parsFile <- file.path(aws_dir, "AWS_DATA", "JSON", "aws_parameters.json")
@@ -112,9 +117,7 @@ tsRainAccumulAWS <- function(tstep, net_aws, start, end, accumul, aws_dir)
     aws_id <- sapply(awsPars, "[[", "id")
     istn <- which(net_code == net_aws[1] & aws_id == net_aws[2])
     awsPars <- awsPars[[istn]]
-    coordAWS <- awsPars[c("network_code", "network", "id", "name",
-                          "longitude", "latitude", "altitude",
-                          "province", "district")]
+    coordAWS <- awsPars[nmCol]
     out <- list(data = NULL, date = NULL, coords = coordAWS, status = "no-data")
 
     if(is.null(awsPars$PARS_Info[['5']])) return(out)
@@ -184,7 +187,12 @@ tsRainAccumulAWS <- function(tstep, net_aws, start, end, accumul, aws_dir)
 spRainAccumulAWS <- function(tstep, time, accumul, aws_dir){
     tz <- Sys.getenv("TZ")
     origin <- "1970-01-01"
+    netNOM <- c("Tahmo", "Campbell", "Sutron", "Seba", "Microstep", "Adcon")
+    netCRDS <- c("tahmo_crds", "campbell_crds", "sutron_crds", "seba_crds",
+                 "microstep_crds", "adcon_crds")
+    nmCol <- c("id", "name", "longitude", "latitude", "altitude", "network")
 
+    #####
     accumul <- as.numeric(accumul)
 
     infoData <- switch(tstep,
@@ -267,9 +275,6 @@ spRainAccumulAWS <- function(tstep, time, accumul, aws_dir){
 
     if(all(is.na(don))) return(data.null)
 
-    netNOM <- c("Tahmo", "Campbell", "Sutron", "Seba", "Microstep", "Adcon")
-    netCRDS <- c("tahmo_crds", "campbell_crds", "sutron_crds", "seba_crds",
-                 "microstep_crds", "adcon_crds")
     crds <- lapply(seq_along(netNOM), function(j){
         crd <- DBI::dbReadTable(conn, netCRDS[j])
         crd$network <- netNOM[j]
@@ -278,29 +283,14 @@ spRainAccumulAWS <- function(tstep, time, accumul, aws_dir){
         return(crd)
     })
 
-    # adcoCrd <- DBI::dbReadTable(conn, "adcon_crds")
-    # adcoCrd$network <- "Adcon"
-    # campCrd <- DBI::dbReadTable(conn, "campbell_crds")
-    # campCrd$network <- "Campbell"
-
     DBI::dbDisconnect(conn)
 
     id_net <- lapply(crds, '[[', 'network_code')
     id_net <- do.call(c, id_net)
 
-    nmCol <- c("id", "name", "longitude", "latitude", "altitude", "network")
-    # crds <- rbind(adcoCrd[, nmCol, drop = FALSE],
-    #               campCrd[, nmCol, drop = FALSE])
-
     crds <- lapply(crds, function(x) x[, nmCol, drop = FALSE])
     crds <- do.call(rbind, crds)
     id_aws <- paste0(id_net, "_", crds$id)
-
-    # id_net <- rep(NA, nrow(crds))
-    # id_net[crds$network == "Campbell"] <- 1
-    # id_net[crds$network == "Adcon"] <- 2
-    # # crds$network_code <- id_net
-    # id_aws <- paste0(id_net, "_", crds$id)
 
     ix <- match(id, id_aws)
     crds <- crds[ix, , drop = FALSE]

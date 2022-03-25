@@ -7,7 +7,8 @@
 tableAWSCoords(network, aws_dir)
 }
 \arguments{
-\item{network}{the AWS network code; 1: tahmo, 2: campbell, 3: sutron, 4: seba, 5: microstep, 6: adcon.}
+\item{network}{the AWS network code; 
+1: tahmo, 2: campbell, 3: sutron, 4: seba, 5: microstep, 6: adcon.}
 
 \item{aws_dir}{full path to the directory containing ADT.\cr
 Example: "D:/KMD_AWS_v2"}

@@ -2,7 +2,8 @@
 #'
 #' Get wind data for wind barb display.
 #' 
-#' @param net_aws the network code and AWS ID, form <network code>_<AWS ID>. AWS network code, 1: tahmo, 2: campbell, 3: sutron, 4: seba, 5: microstep, 6: adcon.
+#' @param net_aws the network code and AWS ID, form <network code>_<AWS ID>. 
+#' AWS network code, 1: tahmo, 2: campbell, 3: sutron, 4: seba, 5: microstep, 6: adcon.
 #' @param height the observation height.
 #' @param tstep time step of the data.
 #' @param start start time.
@@ -55,7 +56,8 @@ chartWindBarb <- function(net_aws, height, tstep, start, end, aws_dir)
 #'
 #' Get wind data to display wind rose.
 #' 
-#' @param net_aws the network code and AWS ID, form <network code>_<AWS ID>. AWS network code, 1: tahmo, 2: campbell, 3: sutron, 4: seba, 5: microstep, 6: adcon.
+#' @param net_aws the network code and AWS ID, form <network code>_<AWS ID>. 
+#' AWS network code, 1: tahmo, 2: campbell, 3: sutron, 4: seba, 5: microstep, 6: adcon.
 #' @param height the observation height.
 #' @param tstep time step of the data.
 #' @param start start time.

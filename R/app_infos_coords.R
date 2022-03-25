@@ -37,17 +37,20 @@ readCoordsMap <- function(aws_dir){
 readCoordsData <- function(aws_dir){
     tz <- Sys.getenv("TZ")
     origin <- "1970-01-01"
+    netNOM <- c("Tahmo", "Campbell", "Sutron", "Seba", "Microstep", "Adcon")
+    netKOLS <- c("blue", "green", "violet", "orange", "yellow", "gold")
+    netCRDS <- c("tahmo_crds", "campbell_crds", "sutron_crds", "seba_crds",
+                 "microstep_crds", "adcon_crds")
+    nmCol <- c("id", "name", "longitude", "latitude", "altitude", "network",
+               "network_code", "County", "SubCounty", "startdate", "enddate")
 
+    #############
     adt_args <- readRDS(file.path(aws_dir, "AWS_DATA", "AUTH", "adt.con"))
     con_adt <- try(connect.database(adt_args$connection,
                    RMySQL::MySQL()), silent = TRUE)
     if(inherits(con_adt, "try-error")){
         return(convJSON(NULL))
     }
-
-    netNOM <- c("Tahmo", "Campbell", "Sutron", "Seba", "Microstep", "Adcon")
-    netCRDS <- c("tahmo_crds", "campbell_crds", "sutron_crds", "seba_crds",
-                 "microstep_crds", "adcon_crds")
 
     crds <- lapply(seq_along(netNOM), function(j){
         crd <- DBI::dbReadTable(con_adt, netCRDS[j])
@@ -57,23 +60,10 @@ readCoordsData <- function(aws_dir){
         return(crd)
     })
 
-    # adcoCrd <- DBI::dbReadTable(con_adt, "adcon_crds")
-    # adcoCrd$network <- "Adcon"
-    # adcoCrd$network_code <- 2
-    # campCrd <- DBI::dbReadTable(con_adt, "campbell_crds")
-    # campCrd$network <- "Campbell"
-    # campCrd$network_code <- 1
-
     DBI::dbDisconnect(con_adt)
-
-    nmCol <- c("id", "name", "longitude", "latitude", "altitude", "network",
-               "network_code", "County", "SubCounty", "startdate", "enddate")
 
     crds <- lapply(crds, function(x) x[, nmCol, drop = FALSE])
     crds <- do.call(rbind, crds)
-
-    # crds <- rbind(adcoCrd[, nmCol, drop = FALSE],
-    #               campCrd[, nmCol, drop = FALSE])
 
     #############
     crds$startdate <- as.POSIXct(as.integer(crds$startdate), origin = origin, tz = tz)
@@ -97,14 +87,8 @@ readCoordsData <- function(aws_dir){
     crds <- apply(crds, 2, as.character)
     crds <- cbind(crds, StatusX = "blue")
 
-    #############
-
-    crds[crds[, "network"] == "Tahmo", "StatusX"] <- "blue"
-    crds[crds[, "network"] == "Campbell", "StatusX"] <- "green"
-    crds[crds[, "network"] == "Sutron", "StatusX"] <- "violet"
-    crds[crds[, "network"] == "Seba", "StatusX"] <- "orange"
-    crds[crds[, "network"] == "Microstep", "StatusX"] <- "yellow"
-    crds[crds[, "network"] == "Adcon", "StatusX"] <- "gold"
+    for(j in seq_along(netNOM))
+        crds[crds[, "network"] == netNOM[j], "StatusX"] <- netKOLS[j]
 
     #############
     if(length(icrd) > 0){
@@ -142,7 +126,8 @@ readCoordsData <- function(aws_dir){
 #'
 #' Get AWS coordinates for one network to display on table.
 #' 
-#' @param network the AWS network code; 1: tahmo, 2: campbell, 3: sutron, 4: seba, 5: microstep, 6: adcon.
+#' @param network the AWS network code; 
+#' 1: tahmo, 2: campbell, 3: sutron, 4: seba, 5: microstep, 6: adcon.
 #' @param aws_dir full path to the directory containing ADT.\cr
 #'               Example: "D:/KMD_AWS_v2"
 #' 
@@ -154,15 +139,8 @@ readCoordsData <- function(aws_dir){
 tableAWSCoords <- function(network, aws_dir){
     tz <- Sys.getenv("TZ")
     origin <- "1970-01-01"
-
-    awsnet <- switch(as.character(network),
-                     "1" = "tahmo_crds",
-                     "2" = "campbell_crds",
-                     "3" = "sutron_crds",
-                     "4" = "seba_crds",
-                     "5" = "microstep_crds",
-                     "6" = "adcon_crds"
-                    )
+    AWS_CRDS <- c("tahmo_crds", "campbell_crds", "sutron_crds",
+                  "seba_crds", "microstep_crds", "adcon_crds")
 
     #############
     adt_args <- readRDS(file.path(aws_dir, "AWS_DATA", "AUTH", "adt.con"))
@@ -174,6 +152,7 @@ tableAWSCoords <- function(network, aws_dir){
     }
 
     #############
+    awsnet <- AWS_CRDS[as.integer(network)]
     crds <- DBI::dbReadTable(con_adt, awsnet)
     DBI::dbDisconnect(con_adt)
 
@@ -197,7 +176,8 @@ tableAWSCoords <- function(network, aws_dir){
 #' Get the start and end time of a specified AWS.
 #' 
 #' @param id ID of the AWS.
-#' @param network the AWS network code; 1: tahmo, 2: campbell, 3: sutron, 4: seba, 5: microstep, 6: adcon.
+#' @param network the AWS network code; 
+#' 1: tahmo, 2: campbell, 3: sutron, 4: seba, 5: microstep, 6: adcon.
 #' @param aws_dir full path to the directory containing ADT.\cr
 #'               Example: "D:/KMD_AWS_v2"
 #' 
@@ -209,7 +189,10 @@ tableAWSCoords <- function(network, aws_dir){
 getAWSTimeRange <- function(id, network, aws_dir){
     tz <- Sys.getenv("TZ")
     origin <- "1970-01-01"
+    AWS_CRDS <- c("tahmo_crds", "campbell_crds", "sutron_crds",
+                  "seba_crds", "microstep_crds", "adcon_crds")
 
+    #############
     adt_args <- readRDS(file.path(aws_dir, "AWS_DATA", "AUTH", "adt.con"))
     con_adt <- try(connect.database(adt_args$connection,
                    RMySQL::MySQL()), silent = TRUE)
@@ -217,14 +200,7 @@ getAWSTimeRange <- function(id, network, aws_dir){
         return(convJSON(NULL))
     }
 
-    net_dat <- switch(as.character(network),
-                     "1" = "tahmo_crds",
-                     "2" = "campbell_crds",
-                     "3" = "sutron_crds",
-                     "4" = "seba_crds",
-                     "5" = "microstep_crds",
-                     "6" = "adcon_crds"
-                    )
+    net_dat <- AWS_CRDS[as.integer(network)]
 
     query <- paste0("SELECT startdate, enddate FROM ", net_dat, " WHERE id='", id, "'")
     qres <- DBI::dbGetQuery(con_adt, query)
@@ -271,3 +247,45 @@ readCoordsWind <- function(height, aws_dir){
     return(convJSON(coordAWS))
 }
 
+#############
+#' Get AWS Status data.
+#'
+#' Get AWS Status data to display on map.
+#' 
+#' @param ltime character, the last time duration to display. Options are, "01h", "03h", "06h", 
+#' "12h", "24h", "02d", "03d", "05d", "01w", "02w", "03w", "01m".
+#' @param aws_dir full path to the directory containing ADT.\cr
+#'               Example: "D:/KMD_AWS_v2"
+#' 
+#' @return a JSON object
+#' 
+#' @export
+
+readAWSStatus <- function(ltime, aws_dir){
+    file_stat <- file.path(aws_dir, "AWS_DATA", "STATUS", "aws_status.rds")
+    aws <- readRDS(file_stat)
+    vtime <- as.numeric(substr(ltime, 1, 2))
+    ttime <- substr(ltime, 3, 3)
+    hmul <- switch(ttime, "h" = 1, "d" = 24, "w" = 168, "m" = 720)
+    hour <- vtime * hmul
+    if(hour > 1){
+        ic <- (720 - hour + 1):720
+        stat <- aws$status[, ic]
+        stat <- rowMeans(stat, na.rm = TRUE)
+    }else{
+        nc <- ncol(aws$status)
+        stat <- aws$status[, nc]
+    }
+
+    crds <- aws$coords
+    crds$Availability <- paste(round(stat, 1), "%")
+    kol <- cut(stat, c(0, 25, 50, 75, 100), labels = c('orange','yellow','green','blue'))
+    kol <- as.character(kol)
+    kol <- ifelse(is.na(kol), 'red', kol)
+    crds$StatusX <- kol
+    crds$longitude <- as.numeric(crds$longitude)
+    crds$latitude <- as.numeric(crds$latitude)
+
+    aws <- list(data = crds, time = aws$actual_time, update = aws$updated)
+    return(convJSON(aws))
+}
