@@ -80,6 +80,11 @@ mapMinAWSData <- function(time, aws_dir){
             ix <- NULL
             vr <- 'ST'
         }
+        if(x == "15"){
+            ops <- list(var.name = "SUN", colorP = 'heat.colors')
+            ix <- NULL
+            vr <- 'SUN'
+        }
         if(x == "16"){
             ops <- list(var.name = "SPB", colorP = 'rainbow')
             ix <- NULL

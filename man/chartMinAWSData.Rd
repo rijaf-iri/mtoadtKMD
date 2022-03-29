@@ -2,7 +2,7 @@
 % Please edit documentation in R/app_plotchart_aws.R
 \name{chartMinAWSData}
 \alias{chartMinAWSData}
-\title{Get 5, 10 or 15 minutes data.}
+\title{Get minutes data.}
 \usage{
 chartMinAWSData(net_aws, var_hgt, stat, start, end, plotrange, aws_dir)
 }
@@ -27,5 +27,5 @@ Example: "D:/KMD_AWS_v2"}
 a JSON object
 }
 \description{
-Get 5, 10 or 15 minutes data to display on chart.
+Get minutes data to display on chart.
 }

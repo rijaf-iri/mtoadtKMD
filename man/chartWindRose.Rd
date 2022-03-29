@@ -10,7 +10,7 @@ chartWindRose(net_aws, height, tstep, start, end, aws_dir)
 \item{net_aws}{the network code and AWS ID, form <network code>_<AWS ID>. 
 AWS network code, 1: tahmo, 2: campbell, 3: sutron, 4: seba, 5: microstep, 6: adcon.}
 
-\item{height}{the observation height.}
+\item{height}{wind speed and direction heights above ground, format "<speedHeight>_<directionHeight>".}
 
 \item{tstep}{time step of the data.}
 

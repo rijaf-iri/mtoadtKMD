@@ -2,7 +2,7 @@
 % Please edit documentation in R/app_download_awsdata.R
 \name{downAWSMinDataCSV}
 \alias{downAWSMinDataCSV}
-\title{Get 10 or 15 minutes data.}
+\title{Get minutes data.}
 \usage{
 downAWSMinDataCSV(net_aws, var_hgt, start, end, aws_dir)
 }
@@ -23,5 +23,5 @@ Example: "D:/KMD_AWS_v2"}
 JSON format object
 }
 \description{
-Get 10 or 15 minutes data for download.
+Get minutes data for download.
 }

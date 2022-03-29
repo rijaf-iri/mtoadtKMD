@@ -1,6 +1,6 @@
-#' Get 10 or 15 minutes data.
+#' Get minutes data.
 #'
-#' Get 10 or 15 minutes data for download.
+#' Get minutes data for download.
 #' 
 #' @param net_aws the network code and AWS ID, form <network code>_<AWS ID>. 
 #' AWS network code, 1: tahmo, 2: campbell, 3: sutron, 4: seba, 5: microstep, 6: adcon.
@@ -388,3 +388,27 @@ downRainAccumulTS <- function(tstep, net_aws, start, end, accumul, aws_dir){
     return(convCSV(don))
 }
 
+##########
+#' Download AWS status.
+#'
+#' Download AWS status table.
+#' 
+#' @param aws_dir full path to the directory containing ADT.\cr
+#'               Example: "D:/GMet_AWS_v2"
+#' 
+#' @return CSV object
+#' 
+#' @export
+
+downAWSStatusTable <- function(aws_dir){
+    file_stat <- file.path(aws_dir, "AWS_DATA", "STATUS", "aws_status.rds")
+    aws <- readRDS(file_stat)
+
+    crds <- aws$coords
+    daty <- format(aws$time, "%Y-%m-%d %H:00:00")
+    don <- as.data.frame(aws$status)
+    names(don) <- daty
+    don <- cbind(crds, don)
+
+    return(convCSV(don))
+}

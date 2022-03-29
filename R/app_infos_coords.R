@@ -231,7 +231,7 @@ getAWSTimeRange <- function(id, network, aws_dir){
 #'
 #' Get AWS Wind coordinates to display on map.
 #' 
-#' @param height height above ground, 2 or 10 meters
+#' @param height wind speed and direction heights above ground, format "<speedHeight>_<directionHeight>".
 #' @param aws_dir full path to the directory containing ADT.\cr
 #'               Example: "D:/KMD_AWS_v2"
 #' 
@@ -242,11 +242,14 @@ getAWSTimeRange <- function(id, network, aws_dir){
 readCoordsWind <- function(height, aws_dir){
     parsFile <- file.path(aws_dir, "AWS_DATA", "JSON", "aws_parameters.json")
     awsPars <- jsonlite::read_json(parsFile)
+    height <- strsplit(height, "_")
+    ws_val <- height[[1]][1]
+    wd_val <- height[[1]][2]
 
     coordAWS <- lapply(awsPars, function(x){
         if(all(9:10 %in% unlist(x$PARS))){
-            dd <- height %in% names(x$height[['9']][[1]])
-            ff <- height %in% names(x$height[['10']][[1]])
+            dd <- wd_val %in% names(x$height[['9']][[1]])
+            ff <- ws_val %in% names(x$height[['10']][[1]])
             if(dd & ff){
                 aws <- x[c("network_code", "network", "id", "name")]
                 return(aws)
@@ -260,6 +263,59 @@ readCoordsWind <- function(height, aws_dir){
     coordAWS <- coordAWS[!inull]
 
     return(convJSON(coordAWS))
+}
+
+#############
+#' Get AWS Wind heights.
+#'
+#' Get AWS Wind heights for dropdown select .
+#' 
+#' @param aws_dir full path to the directory containing ADT.\cr
+#'               Example: "D:/KMD_AWS_v2"
+#' 
+#' @return a JSON object
+#' 
+#' @export
+
+getWindHeight <- function(aws_dir){
+    parsFile <- file.path(aws_dir, "AWS_DATA", "JSON", "aws_parameters.json")
+    awsPars <- jsonlite::read_json(parsFile)
+
+    wndHgt <- lapply(awsPars, function(x){
+        if(all(9:10 %in% unlist(x$PARS))){
+            dd_h <- sort(as.numeric(do.call(c, x$height[['9']][[1]])))
+            ff_h <- sort(as.numeric(do.call(c, x$height[['10']][[1]])))
+            if(length(ff_h) > length(dd_h)){
+                dd <- sapply(ff_h, function(v){
+                    ii <- which.min(abs(dd_h - v))
+                    dd_h[ii]
+                })
+                out <- list(wd_val = dd, ws_val = ff_h)
+            }else{
+                ff <- sapply(dd_h, function(v){
+                    ii <- which.min(abs(ff_h - v))
+                    ff_h[ii]
+                })
+                out <- list(wd_val = dd_h, ws_val = ff)
+            }
+
+            ## ZMD wind AWS
+            frac <- out$ws_val %% 1
+            out$wnd_hgt <- round(out$ws_val, 1)
+            out$wnd_idx <- ((frac * 10) %% 1) * 10
+            out <- as.data.frame(out)
+            return(out)
+        }
+
+        return(NULL)
+    })
+
+    inull <- sapply(wndHgt, is.null)
+    wndHgt <- wndHgt[!inull]
+    wndHgt <- do.call(rbind, wndHgt)
+    wndHgt <- wndHgt[!duplicated(wndHgt), , drop = FALSE]
+
+    return(convJSON(wndHgt))
 }
 
 #############
